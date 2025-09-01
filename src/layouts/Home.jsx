@@ -12,6 +12,10 @@ const Home = () => {
             <h2>
                 Mi Home
             </h2>
+            <Button onClick={() => navigate('/semaforo')} label="Ir al Semaforo">
+
+            </Button>
+
             <Button onClick={() => navigate('/tarjeta')} label="Ir al formulario">
 
             </Button>
