@@ -16,6 +16,10 @@ const Home = () => {
 
             </Button>
 
+            <Button onClick={() => navigate('/personas')} label="Ver la lista de personas">
+
+            </Button>
+
         </Fragment>
     )
 

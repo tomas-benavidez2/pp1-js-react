@@ -14,7 +14,10 @@ const opcionesColor = [
 
 const Tarjeta = () =>{
     const[nombre, setNombre] = useState("")
+    const[email, setEmail] = useState("")
     const[color, setColor] = useState('gray')
+    const[terminos, setTerminos] = useState(false)
+    const [intentadoGuardar, setIntentadoGuardar] = useState(false)
     const toast = useRef(null)
 
     const guardar_en_local_storage = (persona) =>{
@@ -24,10 +27,23 @@ const Tarjeta = () =>{
         localStorage.setItem('personas', JSON.stringify(lista))    
     }
 
+    const form_completo = ()=>{
+            const nombreValido = nombre.trim() !== '';
+            const emailValido = email.trim() !== '' && email.includes('@') && email.includes('.');
+            const terminosAceptados = terminos === true;
+             
+
+            return nombreValido && emailValido && terminosAceptados;
+
+    }
+
     const confirmarFormulario = ()=>{
         Swal.fire({
             title:'¿Desea confirmar los datos?',
-            text:`Nombre: ${nombre || "Sin nombre"} | Color: ${color !== 'gray' ? opcionesColor.find((item)=>item.value === color).label : 'Gris'}`,
+            text:`Nombre: ${nombre || "Sin nombre"} |
+                Email: ${email || "Sin email"} |
+                Color: ${color !== 'gray' ? opcionesColor.find((item)=>item.value === color).label : 'Gris'} |
+                Terminos: ${terminos }`,
             icon:'question',
             showCancelButton:true,
             confirmButtonText:'Si, guardar',
@@ -36,7 +52,9 @@ const Tarjeta = () =>{
             if(result.isConfirmed){
                 guardar_en_local_storage({
                     nombre:nombre || 'sin nombre',
-                    color
+                    email:email || 'sin Email',
+                    color,
+                    terminos
                 })
 
 
@@ -49,6 +67,14 @@ const Tarjeta = () =>{
         })
     }
 
+    const nombreError = !nombre.trim() ? 'El nombre es obligatorio.' : null;
+
+    const emailError = !email.trim()
+        ? 'El email es obligatorio.'
+        : !email.includes('@') || !email.includes('.')
+        ? 'El formato del email no es válido.'
+        : null;
+
     return(
         <Fragment>
             <Toast ref={toast}/>
@@ -60,12 +86,25 @@ const Tarjeta = () =>{
                         id="nombre"
                         value={nombre}
                         onChange={(e)=>setNombre(e.target.value)}
+                        required
                         />
                         <label htmlFor="nombre">Nombre</label>
                     </span>
+                    {intentadoGuardar && nombreError && <small style={{ color: 'red', marginLeft: '4px' }}>{nombreError}</small>}
 
+                    <span className="p-float-label">
+                        <InputText
+                        id="Email"
+                        value={email}
+                        type="email"
+                        onChange={(e)=>setEmail(e.target.value)}
+                        />
+                        <label htmlFor="email">Email</label>
+                    </span>
+                    {intentadoGuardar && emailError && <small style={{ color: 'red', marginLeft: '4px' }}>{emailError}</small>}
+                   
                     <div>
-                        <small>Color de fondo</small>
+                        <small>Color de favorito</small>
                         <SelectButton
                         value={color}
                         onChange={(e)=>setColor(e.value)}
@@ -73,31 +112,40 @@ const Tarjeta = () =>{
                         />
                     </div>
 
-                    <div
-                    style={{
-                        backgroundColor: color,
-                        borderRadius:12,
-                        padding:16
-                    }}
-                    >
-                        <h2>Hola, soy {nombre || '_______'}</h2>
-                        <p>Mi color favorito es {color !== 'gray' ? opcionesColor.find((item)=>item.value === color).label : 'Gris'}</p>
+                    <div>
+                        <input
+                            type="checkbox"
+                            id="terms"
+                            checked={terminos}
+                            onChange={(e) => setTerminos(e.target.checked)}
+                            required
+                        />
+                        <label htmlFor="terms">Acepto los términos y condiciones</label>
                     </div>
+                                    
+ 
 
                     <div style={{display:'flex'}}>
                         <Button 
                         label="Guardar"
                         icon='pi pi-check'
                         severity="success"
-                        onClick={()=>confirmarFormulario()}
-                        />
+                        onClick={() => {
+                            setIntentadoGuardar(true); 
+                            if (form_completo()) {   
+                                confirmarFormulario();
+                            }
+                        }}
+                         />
                         <Button
                         label="Limpiar"
                         icon='pi pi-eraser'
                         severity="secondary"
                         onClick={()=>{
                             setNombre("")
+                            setEmail("")
                             setColor('gray')
+                            setTerminos(false)
                         }} 
                         />
                     </div>
