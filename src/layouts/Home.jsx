@@ -20,6 +20,11 @@ const Home = () => {
 
             </Button>
 
+            <Button 
+                onClick={() => navigate('/poke')} 
+                label="Ver Listados Poke"
+            />
+
         </Fragment>
     )
 
